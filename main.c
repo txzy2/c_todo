@@ -38,6 +38,8 @@ void clear_storage(Storage *st);
 
 /* ======= UTILS ======= */
 
+void prepoccess(Storage *st);
+
 void get_time(char *buff, size_t size);
 const char *get_status(enum Status s);
 void print_item(Item *item);
@@ -54,21 +56,6 @@ bool find(Storage *st, int id);
 bool change_status(Storage *st, int id, enum Status s);
 
 /* ======= MAIN ======= */
-
-void prepoccess(Storage *st)
-{
-	if (!init_storage(st, 1))
-	{
-		fprintf(stderr, "Error: failed to initialize storage\n");
-		abort();
-	}
-
-	if (!load_storage(st))
-	{
-		fprintf(stderr, "Error: failed to load storage\n");
-		abort();
-	}
-}
 
 int main(void)
 {
@@ -94,6 +81,21 @@ cleanup:
  */
 
 /* ======= UTILS ======= */
+
+void prepoccess(Storage *st)
+{
+	if (!init_storage(st, 1))
+	{
+		fprintf(stderr, "Error: failed to initialize storage\n");
+		abort();
+	}
+
+	if (!load_storage(st))
+	{
+		fprintf(stderr, "Error: failed to load storage\n");
+		abort();
+	}
+}
 
 void get_time(char *buff, size_t size)
 {
