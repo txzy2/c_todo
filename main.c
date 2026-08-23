@@ -31,7 +31,7 @@ typedef struct
 } Storage;
 
 bool init_storage(Storage *st, uint32_t cap);
-void load_storage(Storage *st);
+bool load_storage(Storage *st);
 void move_into_storage(Storage *st, Item *item);
 
 void clear_storage(Storage *st);
@@ -53,21 +53,31 @@ bool find(Storage *st, int id);
 
 bool change_status(Storage *st, int id, enum Status s);
 
+/* ======= MAIN ======= */
+
+void prepoccess(Storage *st)
+{
+	if (!init_storage(st, 1))
+	{
+		fprintf(stderr, "Error: failed to initialize storage\n");
+		abort();
+	}
+
+	if (!load_storage(st))
+	{
+		fprintf(stderr, "Error: failed to load storage\n");
+		abort();
+	}
+}
+
 int main(void)
 {
 	int result = EXIT_SUCCESS;
 
-	char time_str[BUFFER_TIME];
-	get_time(time_str, BUFFER_TIME);
-	printf("%s\n", time_str);
-
 	Storage st;
-	if (!init_storage(&st, 1))
-	{
-		fprintf(stderr, "Error: failed to initialize storage\n");
-		result = EXIT_FAILURE;
-		goto cleanup;
-	}
+	prepoccess(&st);
+
+	printf("OK\n");
 
 	goto cleanup;
 
@@ -114,6 +124,8 @@ bool init_storage(Storage *st, uint32_t cap)
 
 	return true;
 }
+
+bool load_storage(Storage *st) { return true; }
 
 void clear_storage(Storage *st)
 {
