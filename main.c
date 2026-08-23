@@ -38,7 +38,7 @@ void clear_storage(Storage *st);
 
 /* ======= UTILS ======= */
 
-void prepoccess(Storage *st);
+bool prepoccess(Storage *st);
 
 void get_time(char *buff, size_t size);
 const char *get_status(enum Status s);
@@ -59,14 +59,17 @@ bool change_status(Storage *st, int id, enum Status s);
 
 int main(void)
 {
-	int result = EXIT_SUCCESS;
+	int result = EXIT_FAILURE;
 
 	Storage st;
-	prepoccess(&st);
+	if (!prepoccess(&st))
+	{
+		goto cleanup;
+	}
 
 	printf("OK\n");
 
-	goto cleanup;
+	result = EXIT_SUCCESS;
 
 cleanup:
 	clear_storage(&st);
@@ -82,19 +85,21 @@ cleanup:
 
 /* ======= UTILS ======= */
 
-void prepoccess(Storage *st)
+bool prepoccess(Storage *st)
 {
 	if (!init_storage(st, 1))
 	{
 		fprintf(stderr, "Error: failed to initialize storage\n");
-		abort();
+		return false;
 	}
 
 	if (!load_storage(st))
 	{
 		fprintf(stderr, "Error: failed to load storage\n");
-		abort();
+		return false;
 	}
+
+	return true;
 }
 
 void get_time(char *buff, size_t size)

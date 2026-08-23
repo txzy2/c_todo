@@ -1,7 +1,7 @@
 .PHONY: b r check
 
 init:
-	mkdir -p bin && mkdir -p storage
+	mkdir -p bin storage
 
 b:
 	gcc -Wall -Wextra -pedantic -std=c11 -o bin/main main.c files.c
