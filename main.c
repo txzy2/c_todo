@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 #define BUFFER_TIME 30
@@ -11,13 +12,15 @@ enum Status
 	TODO = 0,
 	DONE,
 	CANCELED,
+	UNKNOWN
 };
 
 typedef struct
 {
 	int id;
-	char *title;
-	char *desc;
+	char title[50];
+	char desc[100];
+	char date[BUFFER_TIME];
 	enum Status status;
 } Item;
 
@@ -41,13 +44,14 @@ void clear_storage(Storage *st);
 bool prepoccess(Storage *st);
 
 void get_time(char *buff, size_t size);
-const char *get_status(enum Status s);
+enum Status string_to_enum(const char *str);
+char *enum_to_string(const enum Status s);
 void print_item(Item *item);
 
 /* ======= ITEMS ======= */
 
-char *get_input(const char *msg);
-Item *create_item();
+char *get_input(const char *msg, const int lenght);
+Item *create_item(const char *title, const char *desc, const enum Status status, Storage *st);
 
 bool create(Storage *st); // GET INPUT + CERATE ITEM + MOVE ITEM INTO STORAGE
 bool delete(Storage *st, int id);
@@ -67,7 +71,10 @@ int main(void)
 		goto cleanup;
 	}
 
-	printf("OK\n");
+	if (!create(&st))
+	{
+		goto cleanup;
+	}
 
 	result = EXIT_SUCCESS;
 
@@ -148,4 +155,132 @@ void clear_storage(Storage *st)
 
 	st->data = NULL;
 	st->size = st->cap = 0;
+}
+
+/**
+ * =============================================================================
+ * ITEMS
+ * This is a list of functions that are used to create, delete, find, change
+ * status of items.
+ * =============================================================================
+ */
+
+void print_item(Item *item)
+{
+	if (item == NULL)
+	{
+		return;
+	}
+
+	char *status = enum_to_string(item->status);
+
+	printf("| ID: %d\n| Title: %s\n| Description: %s\n| Status: %s\n| DATE: %s\n", item->id, item->title, item->desc,
+	       status, item->date);
+}
+
+char *get_input(const char *msg, const int lenght)
+{
+	printf("%s", msg);
+
+	char *buff = malloc(lenght * sizeof(*buff));
+	if (!scanf("%s", buff))
+	{
+		fprintf(stderr, "Error: failed to read input\n");
+		abort();
+	}
+
+	return buff;
+}
+
+char *enum_to_string(const enum Status s)
+{
+	switch (s)
+	{
+	case TODO:
+		return "TODO";
+	case DONE:
+		return "DONE";
+	case CANCELED:
+		return "CANCELED";
+	default:
+	case UNKNOWN:
+		return "UNKNOWN";
+	}
+}
+
+enum Status string_to_enum(const char *str)
+{
+	const char *statuses[] = {"TODO", "DONE", "CANCELED"};
+
+	for (int i = 0; i < 3; i++)
+	{
+		if (strcmp(str, statuses[i]) == 0)
+		{
+			return (enum Status)i;
+		}
+	}
+
+	return UNKNOWN;
+}
+
+Item *create_item(const char *title, const char *desc, const enum Status status, Storage *st)
+{
+	Item *item = malloc(sizeof(Item));
+	if (item == NULL)
+	{
+		return NULL;
+	}
+
+	item->id = st->size + 1;
+
+	strncpy(item->title, title, sizeof(item->title) - 1);
+	item->title[sizeof(item->title) - 1] = '\0';
+
+	strncpy(item->desc, desc, sizeof(item->desc) - 1);
+	item->desc[sizeof(item->desc) - 1] = '\0';
+
+	item->status = status;
+
+	char date[BUFFER_TIME];
+	get_time(date, BUFFER_TIME);
+
+	strncpy(item->date, date, sizeof(item->date) - 1);
+	item->date[sizeof(item->date) - 1] = '\0';
+
+	return item;
+}
+
+bool create(Storage *st)
+{
+	if (st == NULL)
+	{
+		return false;
+	}
+
+	char *title = get_input("Title (max 50 chars): ", 50);
+	char *desc = get_input("Description (max 100 chars): ", 100);
+	char *status = get_input("Status ('DONE', 'TODO', 'CANCELED'): ", 10);
+
+	if (title == NULL || desc == NULL || status == NULL)
+	{
+		return false;
+	}
+
+	enum Status s = string_to_enum(status);
+	if (s == UNKNOWN)
+	{
+		return false;
+	}
+
+	Item *item = create_item(title, desc, s, st);
+	if (item == NULL)
+	{
+		return false;
+	}
+
+	printf("\n========= ITEM DATA =========\n");
+	print_item(item);
+	printf("\n========= ITEM DATA =========\n");
+
+	return true;
 }
