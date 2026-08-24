@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,7 +36,7 @@ typedef struct
 
 bool init_storage(Storage *st, uint32_t cap);
 bool load_storage(Storage *st);
-void move_into_storage(Storage *st, Item *item);
+bool move_into_storage(Storage *st, Item *item);
 
 void clear_storage(Storage *st);
 
@@ -50,7 +51,7 @@ void print_item(Item *item);
 
 /* ======= ITEMS ======= */
 
-char *get_input(const char *msg, const int lenght);
+bool get_input(const char *msg, char *buff, size_t size);
 Item *create_item(const char *title, const char *desc, const enum Status status, Storage *st);
 
 bool create(Storage *st); // GET INPUT + CERATE ITEM + MOVE ITEM INTO STORAGE
@@ -74,6 +75,11 @@ int main(void)
 	if (!create(&st))
 	{
 		goto cleanup;
+	}
+
+	for (uint32_t i = 0; i < st.size; ++i)
+	{
+		print_item(st.data[i]);
 	}
 
 	result = EXIT_SUCCESS;
@@ -157,6 +163,30 @@ void clear_storage(Storage *st)
 	st->size = st->cap = 0;
 }
 
+bool move_into_storage(Storage *st, Item *item)
+{
+	if (st == NULL || item == NULL)
+	{
+		return false;
+	}
+
+	if (st->cap == (uint32_t)st->size)
+	{
+		uint32_t new_cap = st->cap * 2;
+		Item **tmp = realloc(st->data, new_cap * sizeof(*st->data));
+		if (tmp == NULL)
+		{
+			return false;
+		}
+
+		st->data = tmp;
+		st->cap = new_cap;
+	}
+
+	st->data[st->size++] = item;
+	return true;
+}
+
 /**
  * =============================================================================
  * ITEMS
@@ -178,18 +208,23 @@ void print_item(Item *item)
 	       status, item->date);
 }
 
-char *get_input(const char *msg, const int lenght)
+bool get_input(const char *msg, char *buff, size_t size)
 {
-	printf("%s", msg);
-
-	char *buff = malloc(lenght * sizeof(*buff));
-	if (!scanf("%s", buff))
+	if (msg == NULL || buff == NULL || size == 0)
 	{
-		fprintf(stderr, "Error: failed to read input\n");
-		abort();
+		return false;
 	}
 
-	return buff;
+	printf("%s", msg);
+
+	if (fgets(buff, size, stdin) == NULL)
+	{
+		return false;
+	}
+
+	buff[strcspn(buff, "\n")] = '\0';
+
+	return true;
 }
 
 char *enum_to_string(const enum Status s)
@@ -257,30 +292,45 @@ bool create(Storage *st)
 		return false;
 	}
 
-	char *title = get_input("Title (max 50 chars): ", 50);
-	char *desc = get_input("Description (max 100 chars): ", 100);
-	char *status = get_input("Status ('DONE', 'TODO', 'CANCELED'): ", 10);
+	char title[50];
+	char desc[100];
+	char status[10];
 
-	if (title == NULL || desc == NULL || status == NULL)
+	if (!get_input("Title (max 49 chars): ", title, sizeof(title)))
+	{
+		return false;
+	}
+
+	if (!get_input("Description (max 99 chars): ", desc, sizeof(desc)))
+	{
+		return false;
+	}
+
+	if (!get_input("Status ('DONE', 'TODO', 'CANCELED'): ", status, sizeof(status)))
 	{
 		return false;
 	}
 
 	enum Status s = string_to_enum(status);
+
 	if (s == UNKNOWN)
 	{
+		fprintf(stderr, "Error: unknown status\n");
 		return false;
 	}
 
 	Item *item = create_item(title, desc, s, st);
+
 	if (item == NULL)
 	{
 		return false;
 	}
 
-	printf("\n========= ITEM DATA =========\n");
-	print_item(item);
-	printf("\n========= ITEM DATA =========\n");
+	if (!move_into_storage(st, item))
+	{
+		free(item);
+		return false;
+	}
 
 	return true;
 }
