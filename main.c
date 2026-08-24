@@ -268,7 +268,7 @@ bool get_input(const char *msg, char *buff, size_t size)
 	printf("%s\n", msg);
 	printf("> ");
 
-	if (fgets(buff, size, stdin) == NULL)
+	if (fgets(buff, (int)size, stdin) == NULL)
 	{
 		return false;
 	}
@@ -383,5 +383,25 @@ bool create(Storage *st)
 		return false;
 	}
 
-	return true;
+	char buff[100];
+	char date_tmp[BUFFER_TIME];
+
+	strncpy(date_tmp, item->date, sizeof(date_tmp) - 1);
+	date_tmp[sizeof(date_tmp) - 1] = '\0';
+
+	char *p = strchr(date_tmp, '|');
+	if (p != NULL)
+	{
+		*p = '\0';
+	}
+
+	int res = snprintf(buff, sizeof(buff), "%d;%s;%s;%s;%s", item->id, item->title, item->desc,
+	                   enum_to_string(item->status), date_tmp);
+
+	if (res < 0 || (size_t)res > sizeof(buff))
+	{
+		return false;
+	}
+
+	return write_to_file(FILENAME, buff, "a");
 }
