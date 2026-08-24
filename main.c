@@ -50,7 +50,7 @@ void clear_storage(Storage *st);
 /* ======= UTILS ======= */
 
 void clear_terminal(void);
-bool prepoccess(Storage *st);
+bool preprocess(Storage *st);
 
 void get_time(char *buff, size_t size);
 enum Status string_to_enum(const char *str);
@@ -106,7 +106,7 @@ int main(void)
 	}
 
 	Storage st;
-	if (!prepoccess(&st))
+	if (!preprocess(&st))
 	{
 		goto cleanup;
 	}
@@ -116,9 +116,12 @@ int main(void)
 		goto cleanup;
 	}
 
+	printf("\n");
 	for (int i = 0; i < st.size; ++i)
 	{
+		printf("==== ITEM ====\n");
 		print_item(st.data[i]);
+		printf("==============\n");
 	}
 
 	result = EXIT_SUCCESS;
@@ -147,7 +150,7 @@ void clear_terminal(void)
 	fflush(stdout);
 }
 
-bool prepoccess(Storage *st)
+bool preprocess(Storage *st)
 {
 	if (!init_storage(st, 1))
 	{
