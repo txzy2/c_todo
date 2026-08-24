@@ -57,9 +57,11 @@ void print_item(Item *item)
 	}
 
 	char *status = enum_to_string(item->status);
+	char *color = item->status == DONE ? GREEN : item->status == TODO ? YELLOW : RED;
 
-	printf("| ID: %d\n| Title: %s\n| Description: %s\n| Status: %s\n| DATE: %s\n", item->id, item->title, item->desc,
-	       status, item->date);
+	printf("| ID: %d\n| Title: %s\n| Description: %s\n| Status: "
+	       "%s%s" RESET "\n| DATE: %s\n",
+	       item->id, item->title, item->desc, color, status, item->date);
 }
 
 bool get_input(const char *msg, char *buff, size_t size)

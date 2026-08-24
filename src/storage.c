@@ -1,4 +1,8 @@
 #include "../include/storage.h"
+#include "../include/files.h"
+#include "../include/items.h"
+#include "../include/utils.h"
+#include <stdio.h>
 #include <stdlib.h>
 
 bool init_storage(Storage *st, uint32_t cap)
@@ -16,6 +20,46 @@ bool init_storage(Storage *st, uint32_t cap)
 
 	st->size = 0;
 	st->cap = cap;
+
+	return true;
+}
+
+bool load_storage(Storage *st)
+{
+	if (st == NULL)
+	{
+		return false;
+	}
+
+	FILE *fptr = fopen(FILENAME, "r");
+	if (fptr == NULL)
+	{
+		return false;
+	}
+	char buffStr[256];
+	while (fgets(buffStr, sizeof(buffStr), fptr))
+	{
+		char id_str[20], title[100], desc[50], status_str[10], date[BUFFER_TIME];
+
+		if (sscanf(buffStr, "%19[^;];%99[^;];%49[^;];%9[^;];%29[^;\n]", id_str, title, desc, status_str, date) == 5)
+		{
+			enum Status status = string_to_enum(status_str);
+
+			Item *item = create_item(title, desc, status, date, st);
+			if (item == NULL)
+			{
+				fprintf(stderr, "Memory allocation failed\n");
+				continue;
+			}
+
+			if (!move_into_storage(st, item))
+			{
+				free(item);
+			}
+		}
+	}
+	fclose(fptr);
+	return true;
 
 	return true;
 }

@@ -6,7 +6,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-Item *create_item(const char *title, const char *desc, const enum Status status, Storage *st)
+// TODO: Сделать добавлене даты но не обязательным полем
+Item *create_item(const char *title, const char *desc, const enum Status status, char *date, Storage *st)
 {
 	Item *item = malloc(sizeof(Item));
 	if (item == NULL)
@@ -24,11 +25,15 @@ Item *create_item(const char *title, const char *desc, const enum Status status,
 
 	item->status = status;
 
-	char date[BUFFER_TIME];
-	get_time(date, BUFFER_TIME);
-
-	strncpy(item->date, date, sizeof(item->date) - 1);
-	item->date[sizeof(item->date) - 1] = '\0';
+	if (date == NULL)
+	{
+		get_time(item->date, sizeof(item->date));
+	}
+	else
+	{
+		strncpy(item->date, date, sizeof(item->date) - 1);
+		item->date[sizeof(item->date) - 1] = '\0';
+	}
 
 	return item;
 }
@@ -67,7 +72,7 @@ bool create(Storage *st)
 		return false;
 	}
 
-	Item *item = create_item(title, desc, s, st);
+	Item *item = create_item(title, desc, s, NULL, st);
 
 	if (item == NULL)
 	{

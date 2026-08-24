@@ -41,6 +41,12 @@ bool preprocess(Storage *st)
 		return false;
 	}
 
+	if (!load_storage(st))
+	{
+		fprintf(stderr, "Error: failed to load storage\n");
+		return false;
+	}
+
 	return true;
 }
 
