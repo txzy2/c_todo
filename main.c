@@ -49,6 +49,8 @@ void clear_storage(Storage *st);
 
 /* ======= UTILS ======= */
 
+void print_menu();
+
 void clear_terminal(void);
 bool preprocess(Storage *st);
 
@@ -317,7 +319,7 @@ Item *create_item(const char *title, const char *desc, const enum Status status,
 		return NULL;
 	}
 
-	item->id = st->size + 1;
+	item->id = (st->size > 0) ? st->data[st->size - 1]->id + 1 : 1;
 
 	strncpy(item->title, title, sizeof(item->title) - 1);
 	item->title[sizeof(item->title) - 1] = '\0';
