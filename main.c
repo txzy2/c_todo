@@ -1,3 +1,5 @@
+#include <pthread.h>
+#include <stdatomic.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -5,8 +7,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
+
+#include "files.h"
 
 #define BUFFER_TIME 30
+
+atomic_bool running = true;
 
 enum Status
 {
@@ -42,6 +49,7 @@ void clear_storage(Storage *st);
 
 /* ======= UTILS ======= */
 
+void clear_terminal(void);
 bool prepoccess(Storage *st);
 
 void get_time(char *buff, size_t size);
@@ -62,9 +70,40 @@ bool change_status(Storage *st, int id, enum Status s);
 
 /* ======= MAIN ======= */
 
+void *timer_thread(void *arg)
+{
+	(void)arg;
+
+	char timer[BUFFER_TIME];
+
+	while (atomic_load(&running))
+	{
+		get_time(timer, sizeof(timer));
+
+		printf("\033[s");    // сохранить позицию курсора
+		printf("\033[1;1H"); // перейти в начало
+		printf("%s", timer);
+		printf("\033[u"); // восстановить позицию курсора
+
+		fflush(stdout);
+
+		sleep(1);
+	}
+
+	return NULL;
+}
+
 int main(void)
 {
+	clear_terminal();
+
 	int result = EXIT_FAILURE;
+	pthread_t timer;
+
+	if (pthread_create(&timer, NULL, timer_thread, NULL) != 0)
+	{
+		return EXIT_FAILURE;
+	}
 
 	Storage st;
 	if (!prepoccess(&st))
@@ -77,7 +116,7 @@ int main(void)
 		goto cleanup;
 	}
 
-	for (uint32_t i = 0; i < st.size; ++i)
+	for (int i = 0; i < st.size; ++i)
 	{
 		print_item(st.data[i]);
 	}
@@ -85,7 +124,11 @@ int main(void)
 	result = EXIT_SUCCESS;
 
 cleanup:
+	atomic_store(&running, false);
+	pthread_join(timer, NULL);
+
 	clear_storage(&st);
+
 	return result;
 }
 
@@ -98,6 +141,12 @@ cleanup:
 
 /* ======= UTILS ======= */
 
+void clear_terminal(void)
+{
+	printf("\033[2J\033[H");
+	fflush(stdout);
+}
+
 bool prepoccess(Storage *st)
 {
 	if (!init_storage(st, 1))
@@ -106,11 +155,11 @@ bool prepoccess(Storage *st)
 		return false;
 	}
 
-	if (!load_storage(st))
-	{
-		fprintf(stderr, "Error: failed to load storage\n");
-		return false;
-	}
+	// if (!load_storage(st))
+	// {
+	// 	fprintf(stderr, "Error: failed to load storage\n");
+	// 	return false;
+	// }
 
 	return true;
 }
@@ -144,8 +193,6 @@ bool init_storage(Storage *st, uint32_t cap)
 
 	return true;
 }
-
-bool load_storage(Storage *st) { return true; }
 
 void clear_storage(Storage *st)
 {
@@ -215,7 +262,8 @@ bool get_input(const char *msg, char *buff, size_t size)
 		return false;
 	}
 
-	printf("%s", msg);
+	printf("%s\n", msg);
+	printf("> ");
 
 	if (fgets(buff, size, stdin) == NULL)
 	{

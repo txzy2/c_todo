@@ -4,7 +4,7 @@ init:
 	mkdir -p bin storage
 
 b:
-	gcc -Wall -Wextra -pedantic -std=c11 -o bin/main main.c files.c
+	gcc -std=c11 -Wall -Wextra -Wpedantic -pthread main.c -o bin/main
 
 r: b
 	./bin/main
