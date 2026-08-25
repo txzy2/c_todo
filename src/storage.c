@@ -126,6 +126,35 @@ bool move_into_storage(Storage *st, Item *item)
 	return true;
 }
 
+int find_index_by_id(const Storage *st, int id)
+{
+	for (int i = 0; i < st->size; i++)
+	{
+		if (st->data[i] != NULL && st->data[i]->id == id)
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
+bool find_item(Storage *st, const int id)
+{
+	if (st == NULL || id <= 0 || st->size == 0)
+	{
+		return false;
+	}
+
+	int index = find_index_by_id(st, id);
+	if (index == -1)
+	{
+		return false;
+	}
+
+	print_item(st->data[index]);
+	return true;
+}
+
 bool delete_item(Storage *st, const int id)
 {
 	if (st == NULL || id <= 0 || st->size == 0)
@@ -133,16 +162,7 @@ bool delete_item(Storage *st, const int id)
 		return false;
 	}
 
-	int index = -1;
-	for (int i = 0; i < st->size; i++)
-	{
-		if (st->data[i] != NULL && st->data[i]->id == id)
-		{
-			index = i;
-			break;
-		}
-	}
-
+	int index = find_index_by_id(st, id);
 	if (index == -1)
 	{
 		fprintf(stderr, "DELETE ITEM NOT FOUND: id=%d\n", id);
