@@ -113,8 +113,8 @@ bool delete_item(Storage *st, const int id)
 	}
 
 	int new_size = st->size - 1;
-	Item **new_data = malloc(new_size * sizeof(*st->data));
-	if (new_data == NULL && new_size > 0)
+	Item **buff_data = malloc(new_size * sizeof(*st->data));
+	if (buff_data == NULL && new_size > 0)
 	{
 		return false;
 	}
@@ -128,18 +128,21 @@ bool delete_item(Storage *st, const int id)
 		}
 		else
 		{
-			new_data[j++] = st->data[i];
+			// NOTE: Если не нашли то просто пока точ заполняем буффер
+			buff_data[j++] = st->data[i];
 		}
 	}
 
+	// NOTE: Не нашли вообще ничего то просто чистим фуфер и отправляем warning
 	if (j == st->size)
 	{
-		free(new_data);
-		return false;
+		free(buff_data);
+		fprintf(stderr, "DELETE ITEM NOT FOUND\n");
+		return true;
 	}
 
 	free(st->data);
-	st->data = new_data;
+	st->data = buff_data;
 	st->size = new_size;
 
 	if (!write_to_file(FILENAME, "", WRITE))
