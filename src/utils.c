@@ -24,17 +24,17 @@ char *enum_to_string(const enum Status s)
 {
 	switch (s)
 	{
-	case TODO:
-		return "TODO";
-	case DONE:
-		return "DONE";
-	case CANCELED:
-		return "CANCELED";
-	case DELETED:
-		return "DELETED";
-	default:
-	case UNKNOWN:
-		return "UNKNOWN";
+		case TODO:
+			return "TODO";
+		case DONE:
+			return "DONE";
+		case CANCELED:
+			return "CANCELED";
+		case DELETED:
+			return "DELETED";
+		default:
+		case UNKNOWN:
+			return "UNKNOWN";
 	}
 }
 
@@ -53,19 +53,22 @@ enum Status string_to_enum(const char *str)
 	return UNKNOWN;
 }
 
+void print_header(void)
+{
+	printf("\n ID  STATUS  DATE        TITLE\n");
+	printf("---  ------  ----------  ----------------------------\n");
+}
+
 void print_item(Item *item)
 {
 	if (item == NULL)
 	{
 		return;
 	}
-
 	char *status = enum_to_string(item->status);
 	char *color = item->status == DONE ? GREEN : item->status == TODO ? YELLOW : RED;
 
-	printf("| ID: %d\n| Title: %s\n| Description: %s\n| Status: "
-	       "%s%s" RESET "\n| DATE: %s\n",
-	       item->id, item->title, item->desc, color, status, item->date);
+	printf(" %-2d  %s%-6s" RESET "  %-10s  %-.28s\n", item->id, color, status, item->date, item->title);
 }
 
 bool get_input(const char *msg, char *buff, size_t size)
@@ -88,9 +91,10 @@ bool get_input(const char *msg, char *buff, size_t size)
 	return true;
 }
 
-void get_menu()
+void get_menu(void)
 {
-
-	printf(CYAN "\n====== MENU =====\n" RESET "| 1. Add Item\n| 2. Delete Item\n| 3. Edit status\n| 0. Exit" CYAN
-	            "\n====== MENU =====\n" RESET);
+	printf(CYAN "\n-------- MENU --------\n" RESET " 1  Add Item\n"
+	            " 2  Delete Item\n"
+	            " 3  Edit status\n"
+	            " 0  Exit\n" CYAN "-----------------------\n" RESET);
 }

@@ -176,7 +176,7 @@ bool delete_item(Storage *st, const int id)
 
 	if (new_size > 0)
 	{
-		buff_data = malloc(new_size * sizeof(*buff_data));
+		buff_data = malloc(new_size * sizeof(*st->data));
 
 		if (buff_data == NULL)
 		{

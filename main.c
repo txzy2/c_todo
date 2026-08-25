@@ -71,12 +71,10 @@ int main(void)
 	{
 		if (clear_terminal())
 		{
-			printf("\n");
+			print_header();
 			for (int i = 0; i < st.size; ++i)
 			{
-				printf("==== ITEM ====\n");
 				print_item(st.data[i]);
-				printf("==============\n");
 			}
 		}
 
