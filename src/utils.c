@@ -30,6 +30,8 @@ char *enum_to_string(const enum Status s)
 		return "DONE";
 	case CANCELED:
 		return "CANCELED";
+	case DELETED:
+		return "DELETED";
 	default:
 	case UNKNOWN:
 		return "UNKNOWN";
@@ -38,7 +40,7 @@ char *enum_to_string(const enum Status s)
 
 enum Status string_to_enum(const char *str)
 {
-	const char *statuses[] = {"TODO", "DONE", "CANCELED"};
+	const char *statuses[] = {"TODO", "DONE", "CANCELED", "DELETED"};
 
 	for (int i = 0; i < 3; i++)
 	{
@@ -88,6 +90,7 @@ bool get_input(const char *msg, char *buff, size_t size)
 
 void get_menu()
 {
-	printf(CYAN "\n====== MENU =====\n" RESET "| 1. Add Item\n| 2. Delete Item\n| 0. Exit" CYAN
+
+	printf(CYAN "\n====== MENU =====\n" RESET "| 1. Add Item\n| 2. Delete Item\n| 3. Edit status\n| 0. Exit" CYAN
 	            "\n====== MENU =====\n" RESET);
 }

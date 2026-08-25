@@ -12,6 +12,7 @@ enum Status
 	TODO = 0,
 	DONE,
 	CANCELED,
+	DELETED,
 	UNKNOWN
 };
 

@@ -3,8 +3,11 @@
 #include "../include/items.h"
 #include "../include/utils.h"
 #include <linux/limits.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <strings.h>
 
 bool init_storage(Storage *st, uint32_t cap)
 {
@@ -38,6 +41,7 @@ bool load_storage(Storage *st)
 		return false;
 	}
 	char buffStr[256];
+
 	while (fgets(buffStr, sizeof(buffStr), fptr))
 	{
 		char id_str[20], title[100], desc[50], status_str[10], date[BUFFER_TIME];
@@ -46,21 +50,37 @@ bool load_storage(Storage *st)
 		{
 			enum Status status = string_to_enum(status_str);
 
-			Item *item = create_item(id_str, title, desc, status, date, st);
-			if (item == NULL)
+			if (status == DONE || status == TODO)
 			{
-				fprintf(stderr, "Memory allocation failed\n");
-				continue;
-			}
+				Item *item = create_item(id_str, title, desc, status, date, st);
+				if (item == NULL)
+				{
+					fprintf(stderr, "Memory allocation failed\n");
+					continue;
+				}
 
-			if (!move_into_storage(st, item))
+				if (!move_into_storage(st, item))
+				{
+					free(item);
+				}
+			}
+			else
 			{
-				free(item);
+				if (!remove_line_from_file(FILENAME, buffStr))
+				{
+					write_to_file(LOG_FILE, "ERROR REMOVE FROM MAIN FILE", APPEND);
+					continue;
+				}
+
+				if (!move_into_archive(buffStr))
+				{
+					write_to_file(LOG_FILE, "ERROR MOVE TO ARCHIVE", APPEND);
+					continue;
+				}
 			}
 		}
 	}
 	fclose(fptr);
-	return true;
 
 	return true;
 }
@@ -112,35 +132,49 @@ bool delete_item(Storage *st, const int id)
 		return false;
 	}
 
-	int new_size = st->size - 1;
-	Item **buff_data = malloc(new_size * sizeof(*st->data));
-	if (buff_data == NULL && new_size > 0)
+	int index = -1;
+	for (int i = 0; i < st->size; i++)
 	{
+		if (st->data[i] != NULL && st->data[i]->id == id)
+		{
+			index = i;
+			break;
+		}
+	}
+
+	if (index == -1)
+	{
+		fprintf(stderr, "DELETE ITEM NOT FOUND: id=%d\n", id);
 		return false;
 	}
 
-	int j = 0;
-	for (int i = 0; i < st->size; i++)
-	{
-		if (st->data[i]->id == id)
-		{
-			free(st->data[i]);
-		}
-		else
-		{
-			buff_data[j] = st->data[i]; // NOTE: Если не нашли то просто пока точ заполняем буфер
-			j++;
-		}
-	}
+	free(st->data[index]);
 
-	if (j == st->size) // NOTE: Не нашли вообще ничего то просто чистим буфер и отправляем warning
+	int new_size = st->size - 1;
+	Item **buff_data = NULL;
+
+	if (new_size > 0)
 	{
-		free(buff_data);
-		fprintf(stderr, "DELETE ITEM NOT FOUND\n");
-		return true;
+		buff_data = malloc(new_size * sizeof(*buff_data));
+
+		if (buff_data == NULL)
+		{
+			return false;
+		}
+
+		int j = 0;
+
+		for (int i = 0; i < st->size; i++)
+		{
+			if (i != index)
+			{
+				buff_data[j++] = st->data[i];
+			}
+		}
 	}
 
 	free(st->data);
+
 	st->data = buff_data;
 	st->size = new_size;
 
@@ -153,7 +187,9 @@ bool delete_item(Storage *st, const int id)
 	for (int i = 0; i < st->size; i++)
 	{
 		char buff[256];
+
 		Item *item = st->data[i];
+
 		snprintf(buff, sizeof(buff), "%d;%s;%s;%s;%s", item->id, item->title, item->desc, enum_to_string(item->status),
 		         item->date);
 
@@ -163,6 +199,18 @@ bool delete_item(Storage *st, const int id)
 			return false;
 		}
 	}
+
+	return true;
+}
+
+bool move_into_archive(char *str)
+{
+	if (str == NULL)
+	{
+		return false;
+	}
+
+	write_to_file(ARCHIVE_FILE, str, APPEND);
 
 	return true;
 }

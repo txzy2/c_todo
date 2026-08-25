@@ -66,7 +66,7 @@ bool create(Storage *st)
 		return false;
 	}
 
-	if (!get_input("Status ('DONE', 'TODO', 'CANCELED'): ", status, sizeof(status)))
+	if (!get_input("Status ('DONE', 'TODO'): ", status, sizeof(status)))
 	{
 		return false;
 	}
@@ -78,9 +78,13 @@ bool create(Storage *st)
 		fprintf(stderr, "Error: unknown status\n");
 		return false;
 	}
+	else if (s != DONE && s != TODO)
+	{
+		fprintf(stderr, "Error: status must be 'TODO' or 'DONE'\n");
+		return false;
+	}
 
 	Item *item = create_item(NULL, title, desc, s, NULL, st);
-
 	if (item == NULL)
 	{
 		return false;
