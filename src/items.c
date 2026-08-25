@@ -6,7 +6,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-Item *create_item(const char *title, const char *desc, const enum Status status, char *date, Storage *st)
+Item *create_item(const char *id, const char *title, const char *desc, const enum Status status, char *date,
+                  Storage *st)
 {
 	Item *item = malloc(sizeof(Item));
 	if (item == NULL)
@@ -14,7 +15,14 @@ Item *create_item(const char *title, const char *desc, const enum Status status,
 		return NULL;
 	}
 
-	item->id = (st->size > 0) ? st->data[st->size - 1]->id + 1 : 1;
+	if (id == NULL)
+	{
+		item->id = (st->size > 0) ? st->data[st->size - 1]->id + 1 : 1;
+	}
+	else
+	{
+		item->id = atoi(id);
+	}
 
 	strncpy(item->title, title, sizeof(item->title) - 1);
 	item->title[sizeof(item->title) - 1] = '\0';
@@ -71,7 +79,7 @@ bool create(Storage *st)
 		return false;
 	}
 
-	Item *item = create_item(title, desc, s, NULL, st);
+	Item *item = create_item(NULL, title, desc, s, NULL, st);
 
 	if (item == NULL)
 	{

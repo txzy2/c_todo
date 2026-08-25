@@ -46,7 +46,7 @@ bool load_storage(Storage *st)
 		{
 			enum Status status = string_to_enum(status_str);
 
-			Item *item = create_item(title, desc, status, date, st);
+			Item *item = create_item(id_str, title, desc, status, date, st);
 			if (item == NULL)
 			{
 				fprintf(stderr, "Memory allocation failed\n");
@@ -128,7 +128,8 @@ bool delete_item(Storage *st, const int id)
 		}
 		else
 		{
-			buff_data[j++] = st->data[i]; // NOTE: Если не нашли то просто пока точ заполняем буфер
+			buff_data[j] = st->data[i]; // NOTE: Если не нашли то просто пока точ заполняем буфер
+			j++;
 		}
 	}
 
