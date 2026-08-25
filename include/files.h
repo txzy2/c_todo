@@ -5,6 +5,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#define WRITE "w"
+#define APPEND "a"
+#define READ "r"
+
 #define FILENAME "./storage/todos.csv"
 
 bool write_to_file(const char *filename, const char *text, const char *mode);

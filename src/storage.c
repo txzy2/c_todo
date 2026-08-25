@@ -2,6 +2,7 @@
 #include "../include/files.h"
 #include "../include/items.h"
 #include "../include/utils.h"
+#include <linux/limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -101,5 +102,65 @@ bool move_into_storage(Storage *st, Item *item)
 	}
 
 	st->data[st->size++] = item;
+	return true;
+}
+
+bool delete_item(Storage *st, const int id)
+{
+	if (st == NULL || id <= 0 || st->size == 0)
+	{
+		return false;
+	}
+
+	int new_size = st->size - 1;
+	Item **new_data = malloc(new_size * sizeof(*st->data));
+	if (new_data == NULL && new_size > 0)
+	{
+		return false;
+	}
+
+	int j = 0;
+	for (int i = 0; i < st->size; i++)
+	{
+		if (st->data[i]->id == id)
+		{
+			free(st->data[i]);
+		}
+		else
+		{
+			new_data[j++] = st->data[i];
+		}
+	}
+
+	if (j == st->size)
+	{
+		free(new_data);
+		return false;
+	}
+
+	free(st->data);
+	st->data = new_data;
+	st->size = new_size;
+
+	if (!write_to_file(FILENAME, "", WRITE))
+	{
+		fprintf(stderr, "ERROR WRITE TO FILE\n");
+		return false;
+	}
+
+	for (int i = 0; i < st->size; i++)
+	{
+		char buff[256];
+		Item *item = st->data[i];
+		snprintf(buff, sizeof(buff), "%d;%s;%s;%s;%s", item->id, item->title, item->desc, enum_to_string(item->status),
+		         item->date);
+
+		if (!write_to_file(FILENAME, buff, APPEND))
+		{
+			fprintf(stderr, "ERROR APPEND TO FILE\n");
+			return false;
+		}
+	}
+
 	return true;
 }

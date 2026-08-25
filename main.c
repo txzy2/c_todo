@@ -52,8 +52,6 @@ bool preprocess(Storage *st)
 
 int main(void)
 {
-	clear_terminal();
-
 	int result = EXIT_FAILURE;
 	pthread_t timer;
 
@@ -68,7 +66,25 @@ int main(void)
 		goto cleanup;
 	}
 
+	if (clear_terminal())
+	{
+		get_menu();
+	}
+
 	if (!create(&st))
+	{
+		goto cleanup;
+	}
+
+	printf("\n");
+	for (int i = 0; i < st.size; ++i)
+	{
+		printf("==== ITEM ====\n");
+		print_item(st.data[i]);
+		printf("==============\n");
+	}
+
+	if (!delete_item(&st, 3))
 	{
 		goto cleanup;
 	}

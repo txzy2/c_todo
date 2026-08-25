@@ -3,10 +3,12 @@
 #include <string.h>
 #include <time.h>
 
-void clear_terminal(void)
+bool clear_terminal(void)
 {
 	printf("\033[2J\033[H");
 	fflush(stdout);
+
+	return true;
 }
 
 void get_time(char *buff, size_t size)
@@ -83,3 +85,5 @@ bool get_input(const char *msg, char *buff, size_t size)
 
 	return true;
 }
+
+void get_menu() { printf(CYAN "\n====== MENU =====\n" RESET); }

@@ -6,7 +6,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-// TODO: Сделать добавлене даты но не обязательным полем
 Item *create_item(const char *title, const char *desc, const enum Status status, char *date, Storage *st)
 {
 	Item *item = malloc(sizeof(Item));
@@ -106,20 +105,6 @@ bool create(Storage *st)
 	}
 
 	return write_to_file(FILENAME, buff, "a");
-}
-
-bool delete(Storage *st, int id)
-{
-	(void)st;
-	(void)id;
-	return false;
-}
-
-bool find(Storage *st, int id)
-{
-	(void)st;
-	(void)id;
-	return false;
 }
 
 bool change_status(Storage *st, int id, enum Status s)

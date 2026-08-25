@@ -8,4 +8,7 @@ bool load_storage(Storage *st);
 bool move_into_storage(Storage *st, Item *item);
 void clear_storage(Storage *st);
 
+bool delete_item(Storage *st, const int id);
+bool find_item(Storage *st, const int id);
+
 #endif

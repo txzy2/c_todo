@@ -11,11 +11,14 @@
 #define CYAN "\033[36m"
 #define RESET "\033[0m"
 
-void clear_terminal(void);
+bool clear_terminal(void);
+
 void get_time(char *buff, size_t size);
 enum Status string_to_enum(const char *str);
 char *enum_to_string(const enum Status s);
 void print_item(Item *item);
 bool get_input(const char *msg, char *buff, size_t size);
+
+void get_menu();
 
 #endif
