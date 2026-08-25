@@ -53,6 +53,7 @@ bool preprocess(Storage *st)
 int main(void)
 {
 	int result = EXIT_FAILURE;
+	bool is_running = true;
 	pthread_t timer;
 
 	if (pthread_create(&timer, NULL, timer_thread, NULL) != 0)
@@ -66,35 +67,45 @@ int main(void)
 		goto cleanup;
 	}
 
-	if (clear_terminal())
+	while (is_running)
 	{
+		if (clear_terminal())
+		{
+			printf("\n");
+			for (int i = 0; i < st.size; ++i)
+			{
+				printf("==== ITEM ====\n");
+				print_item(st.data[i]);
+				printf("==============\n");
+			}
+		}
+
 		get_menu();
-	}
+		char choice[10];
+		get_input("Choice", choice, sizeof(choice));
 
-	if (!create(&st))
-	{
-		goto cleanup;
-	}
+		switch (atoi(choice))
+		{
+		case 1:
+		{
+			if (!create(&st))
+			{
+				return false;
+			}
 
-	printf("\n");
-	for (int i = 0; i < st.size; ++i)
-	{
-		printf("==== ITEM ====\n");
-		print_item(st.data[i]);
-		printf("==============\n");
-	}
+			result = EXIT_SUCCESS;
+			goto cleanup;
+		}
+		case 0:
+		default:
+			is_running = false;
+		}
 
-	if (!delete_item(&st, 3))
-	{
-		goto cleanup;
-	}
-
-	printf("\n");
-	for (int i = 0; i < st.size; ++i)
-	{
-		printf("==== ITEM ====\n");
-		print_item(st.data[i]);
-		printf("==============\n");
+		if (!is_running)
+		{
+			printf("Bye-bye! Press Enter to continue...");
+			getchar();
+		}
 	}
 
 	result = EXIT_SUCCESS;

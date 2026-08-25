@@ -86,4 +86,8 @@ bool get_input(const char *msg, char *buff, size_t size)
 	return true;
 }
 
-void get_menu() { printf(CYAN "\n====== MENU =====\n" RESET); }
+void get_menu()
+{
+	printf(CYAN "\n====== MENU =====\n" RESET "| 1. Add Item\n| 2. Delete Item\n| 0. Exit" CYAN
+	            "\n====== MENU =====\n" RESET);
+}

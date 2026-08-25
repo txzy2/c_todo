@@ -128,13 +128,11 @@ bool delete_item(Storage *st, const int id)
 		}
 		else
 		{
-			// NOTE: Если не нашли то просто пока точ заполняем буффер
-			buff_data[j++] = st->data[i];
+			buff_data[j++] = st->data[i]; // NOTE: Если не нашли то просто пока точ заполняем буфер
 		}
 	}
 
-	// NOTE: Не нашли вообще ничего то просто чистим фуфер и отправляем warning
-	if (j == st->size)
+	if (j == st->size) // NOTE: Не нашли вообще ничего то просто чистим буфер и отправляем warning
 	{
 		free(buff_data);
 		fprintf(stderr, "DELETE ITEM NOT FOUND\n");
