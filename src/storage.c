@@ -138,21 +138,20 @@ int find_index_by_id(const Storage *st, int id)
 	return -1;
 }
 
-bool find_item(Storage *st, const int id)
+Item *find_item(Storage *st, const int id)
 {
 	if (st == NULL || id <= 0 || st->size == 0)
 	{
-		return false;
+		return NULL;
 	}
 
 	int index = find_index_by_id(st, id);
 	if (index == -1)
 	{
-		return false;
+		return NULL;
 	}
 
-	print_item(st->data[index]);
-	return true;
+	return st->data[index];
 }
 
 bool delete_item(Storage *st, const int id)

@@ -20,6 +20,7 @@ char *enum_to_string(const enum Status s);
 void print_header(void);
 void print_item(Item *item);
 void print_items_by_status(Storage *st, enum Status status);
+void print_item_details(Item *item);
 
 bool get_input(const char *msg, char *buff, size_t size);
 

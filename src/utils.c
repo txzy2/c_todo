@@ -53,6 +53,26 @@ enum Status string_to_enum(const char *str)
 	return UNKNOWN;
 }
 
+bool get_input(const char *msg, char *buff, size_t size)
+{
+	if (msg == NULL || buff == NULL || size == 0)
+	{
+		return false;
+	}
+
+	printf("%s\n", msg);
+	printf("> ");
+
+	if (fgets(buff, (int)size, stdin) == NULL)
+	{
+		return false;
+	}
+
+	buff[strcspn(buff, "\n")] = '\0';
+
+	return true;
+}
+
 void print_header(void)
 {
 	printf("\n ID  STATUS  DATE        TITLE\n");
@@ -82,30 +102,29 @@ void print_items_by_status(Storage *st, enum Status status)
 	}
 }
 
-bool get_input(const char *msg, char *buff, size_t size)
-{
-	if (msg == NULL || buff == NULL || size == 0)
-	{
-		return false;
-	}
-
-	printf("%s\n", msg);
-	printf("> ");
-
-	if (fgets(buff, (int)size, stdin) == NULL)
-	{
-		return false;
-	}
-
-	buff[strcspn(buff, "\n")] = '\0';
-
-	return true;
-}
-
 void get_menu(void)
 {
 	printf(CYAN "\n-------- MENU --------\n" RESET " 1  Add Item\n"
 	            " 2  Delete Item\n"
 	            " 3  View Item\n"
 	            " 0  Exit\n" CYAN "-----------------------\n" RESET);
+}
+
+void print_item_details(Item *item)
+{
+	if (item == NULL)
+	{
+		return;
+	}
+
+	char *status = enum_to_string(item->status);
+	char *color = item->status == DONE ? GREEN : item->status == TODO ? YELLOW : RED;
+
+	printf("\n-------------- ITEM #%d --------------\n"
+	       "Title:       %s\n"
+	       "Description: %s\n"
+	       "Status:      %s%s" RESET "\n"
+	       "Date:        %s\n"
+	       "-------------------------------------\n",
+	       item->id, item->title, item->desc, color, status, item->date);
 }

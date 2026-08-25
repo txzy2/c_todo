@@ -61,7 +61,7 @@ int main(void)
 		return EXIT_FAILURE;
 	}
 
-	Storage st;
+	Storage st = {0};
 	if (!preprocess(&st))
 	{
 		goto cleanup;
@@ -109,6 +109,30 @@ int main(void)
 
 				printf("ITEM DELETED\n");
 				result = EXIT_SUCCESS;
+				break;
+			}
+			case 3:
+			{
+				char id[10];
+				get_input("Paste ID:", id, sizeof(id));
+				if (atoi(id) == 0)
+				{
+					fprintf(stderr, "INVALID INPUT\n");
+					break;
+				}
+
+				Item *item = find_item(&st, atoi(id));
+				if (item == NULL)
+				{
+					fprintf(stderr, "ITEM NOT FOUND\n");
+				}
+				else
+				{
+					print_item_details(item);
+				}
+
+				printf("\nPress Enter to continue...");
+				getchar();
 				break;
 			}
 			case 0:
