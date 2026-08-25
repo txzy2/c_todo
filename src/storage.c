@@ -112,6 +112,7 @@ bool move_into_storage(Storage *st, Item *item)
 	{
 		uint32_t new_cap = st->cap * 2;
 		Item **tmp = realloc(st->data, new_cap * sizeof(*st->data));
+
 		if (tmp == NULL)
 		{
 			return false;
@@ -211,6 +212,5 @@ bool move_into_archive(char *str)
 	}
 
 	write_to_file(ARCHIVE_FILE, str, APPEND);
-
 	return true;
 }

@@ -86,38 +86,38 @@ int main(void)
 
 		switch (atoi(choice))
 		{
-		case 1:
-		{
-			if (!create(&st))
+			case 1:
 			{
+				if (!create(&st))
+				{
+					goto cleanup;
+				}
+
+				result = EXIT_SUCCESS;
 				goto cleanup;
 			}
-
-			result = EXIT_SUCCESS;
-			goto cleanup;
-		}
-		case 2:
-		{
-			char id[10];
-			get_input("Paste ID:", id, sizeof(id));
-			if (atoi(id) == 0)
+			case 2:
 			{
-				fprintf(stderr, "INVALID INPUT\n");
+				char id[10];
+				get_input("Paste ID:", id, sizeof(id));
+				if (atoi(id) == 0)
+				{
+					fprintf(stderr, "INVALID INPUT\n");
+					goto cleanup;
+				}
+
+				if (!delete_item(&st, atoi(id)))
+				{
+					goto cleanup;
+				}
+
+				printf("ITEM DELETED\n");
+				result = EXIT_SUCCESS;
 				goto cleanup;
 			}
-
-			if (!delete_item(&st, atoi(id)))
-			{
-				goto cleanup;
-			}
-
-			printf("ITEM DELETED\n");
-			result = EXIT_SUCCESS;
-			goto cleanup;
-		}
-		case 0:
-		default:
-			is_running = false;
+			case 0:
+			default:
+				is_running = false;
 		}
 
 		if (!is_running)
