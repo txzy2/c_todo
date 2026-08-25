@@ -2,9 +2,14 @@
 #include <limits.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 
 #define READ_LENGTH 100
+char FILENAME[MAX_PATH_LEN];
+char ARCHIVE_FILE[MAX_PATH_LEN];
+char LOG_FILE[MAX_PATH_LEN];
 
 bool write_to_file(const char *filename, const char *text, const char *mode)
 {
@@ -111,4 +116,54 @@ bool remove_line_from_file(const char *filename, const char *target)
 	}
 
 	return true;
+}
+
+void init_storage_paths(void)
+{
+	const char *override = getenv("TXTODO_HOME");
+	char base_dir[MAX_PATH_LEN];
+	int res;
+
+	if (override != NULL)
+	{
+		res = snprintf(base_dir, sizeof(base_dir), "%s", override);
+	}
+	else
+	{
+		const char *home = getenv("HOME");
+		if (home == NULL)
+		{
+			home = ".";
+		}
+		res = snprintf(base_dir, sizeof(base_dir), "%s/.local/share/%s", home, STORAGE_DIR_NAME);
+	}
+
+	if (res < 0 || (size_t)res >= sizeof(base_dir))
+	{
+		fprintf(stderr, "Error: storage base path too long\n");
+		exit(EXIT_FAILURE);
+	}
+
+	mkdir(base_dir, 0755);
+
+	res = snprintf(FILENAME, sizeof(FILENAME), "%s/todos.csv", base_dir);
+	if (res < 0 || (size_t)res >= sizeof(FILENAME))
+	{
+		fprintf(stderr, "Error: storage path too long\n");
+		exit(EXIT_FAILURE);
+	}
+
+	res = snprintf(ARCHIVE_FILE, sizeof(ARCHIVE_FILE), "%s/archive.csv", base_dir);
+	if (res < 0 || (size_t)res >= sizeof(ARCHIVE_FILE))
+	{
+		fprintf(stderr, "Error: archive path too long\n");
+		exit(EXIT_FAILURE);
+	}
+
+	res = snprintf(LOG_FILE, sizeof(LOG_FILE), "%s/log.txt", base_dir);
+	if (res < 0 || (size_t)res >= sizeof(LOG_FILE))
+	{
+		fprintf(stderr, "Error: log path too long\n");
+		exit(EXIT_FAILURE);
+	}
 }

@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "include/files.h"
 #include "include/items.h"
 #include "include/storage.h"
 #include "include/utils.h"
@@ -52,6 +53,8 @@ bool preprocess(Storage *st)
 
 int main(void)
 {
+	init_storage_paths();
+
 	int result = EXIT_FAILURE;
 	bool is_running = true;
 	pthread_t timer;

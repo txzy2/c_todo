@@ -38,7 +38,7 @@ bool load_storage(Storage *st)
 	FILE *fptr = fopen(FILENAME, "r");
 	if (fptr == NULL)
 	{
-		return false;
+		return true;
 	}
 	char buffStr[LINE_BUFFER_SIZE];
 
