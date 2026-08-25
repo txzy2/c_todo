@@ -52,8 +52,8 @@ bool create(Storage *st)
 		return false;
 	}
 
-	char title[50];
-	char desc[100];
+	char title[TITLE_LENGTH];
+	char desc[DESC_LENGTH];
 	char status[10];
 
 	if (!get_input("Title (max 49 chars): ", title, sizeof(title)))
@@ -61,7 +61,7 @@ bool create(Storage *st)
 		return false;
 	}
 
-	if (!get_input("Description (max 99 chars): ", desc, sizeof(desc)))
+	if (!get_input("Description (max 255 chars): ", desc, sizeof(desc)))
 	{
 		return false;
 	}
@@ -96,7 +96,7 @@ bool create(Storage *st)
 		return false;
 	}
 
-	char buff[100];
+	char buff[LINE_BUFFER_SIZE];
 	char date_tmp[BUFFER_TIME];
 
 	strncpy(date_tmp, item->date, sizeof(date_tmp) - 1);
@@ -111,8 +111,9 @@ bool create(Storage *st)
 	int res = snprintf(buff, sizeof(buff), "%d;%s;%s;%s;%s", item->id, item->title, item->desc,
 	                   enum_to_string(item->status), date_tmp);
 
-	if (res < 0 || (size_t)res > sizeof(buff))
+	if (res < 0 || (size_t)res >= sizeof(buff))
 	{
+		fprintf(stderr, "Error: item line too long\n");
 		return false;
 	}
 

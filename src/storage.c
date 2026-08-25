@@ -40,13 +40,13 @@ bool load_storage(Storage *st)
 	{
 		return false;
 	}
-	char buffStr[256];
+	char buffStr[LINE_BUFFER_SIZE];
 
 	while (fgets(buffStr, sizeof(buffStr), fptr))
 	{
-		char id_str[20], title[100], desc[50], status_str[10], date[BUFFER_TIME];
+		char id_str[20], title[TITLE_LENGTH], desc[DESC_LENGTH], status_str[10], date[BUFFER_TIME];
 
-		if (sscanf(buffStr, "%19[^;];%99[^;];%49[^;];%9[^;];%29[^;\n]", id_str, title, desc, status_str, date) == 5)
+		if (sscanf(buffStr, "%19[^;];%49[^;];%255[^;];%9[^;];%29[^;\n]", id_str, title, desc, status_str, date) == 5)
 		{
 			enum Status status = string_to_enum(status_str);
 
@@ -206,8 +206,7 @@ bool delete_item(Storage *st, const int id)
 
 	for (int i = 0; i < st->size; i++)
 	{
-		char buff[256];
-
+		char buff[LINE_BUFFER_SIZE];
 		Item *item = st->data[i];
 
 		snprintf(buff, sizeof(buff), "%d;%s;%s;%s;%s", item->id, item->title, item->desc, enum_to_string(item->status),

@@ -5,7 +5,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define BUFFER_TIME 30
+#define BUFFER_TIME      30
+#define TITLE_LENGTH     50
+#define DESC_LENGTH      256
+#define LINE_BUFFER_SIZE (TITLE_LENGTH + DESC_LENGTH + BUFFER_TIME + 32)
 
 enum Status
 {
@@ -19,8 +22,8 @@ enum Status
 typedef struct
 {
 	int id;
-	char title[50];
-	char desc[100];
+	char title[TITLE_LENGTH];
+	char desc[DESC_LENGTH];
 	char date[BUFFER_TIME];
 	enum Status status;
 } Item;

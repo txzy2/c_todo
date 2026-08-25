@@ -71,9 +71,12 @@ int main(void)
 	{
 		if (clear_terminal())
 		{
-			print_header();
-			print_items_by_status(&st, TODO);
-			print_items_by_status(&st, DONE);
+			if (st.size > 0)
+			{
+				print_header();
+				print_items_by_status(&st, TODO);
+				print_items_by_status(&st, DONE);
+			}
 		}
 
 		get_menu();
@@ -86,7 +89,8 @@ int main(void)
 			{
 				if (!create(&st))
 				{
-					goto cleanup;
+					fprintf(stderr, "Error: failed to create item\n");
+					break;
 				}
 
 				result = EXIT_SUCCESS;
