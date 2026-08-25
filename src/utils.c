@@ -71,6 +71,17 @@ void print_item(Item *item)
 	printf(" %-2d  %s%-6s" RESET "  %-10s  %-.28s\n", item->id, color, status, item->date, item->title);
 }
 
+void print_items_by_status(Storage *st, enum Status status)
+{
+	for (int i = 0; i < st->size; ++i)
+	{
+		if (st->data[i]->status == status)
+		{
+			print_item(st->data[i]);
+		}
+	}
+}
+
 bool get_input(const char *msg, char *buff, size_t size)
 {
 	if (msg == NULL || buff == NULL || size == 0)
@@ -95,6 +106,6 @@ void get_menu(void)
 {
 	printf(CYAN "\n-------- MENU --------\n" RESET " 1  Add Item\n"
 	            " 2  Delete Item\n"
-	            " 3  Edit status\n"
+	            " 3  View Item\n"
 	            " 0  Exit\n" CYAN "-----------------------\n" RESET);
 }

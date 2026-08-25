@@ -72,10 +72,8 @@ int main(void)
 		if (clear_terminal())
 		{
 			print_header();
-			for (int i = 0; i < st.size; ++i)
-			{
-				print_item(st.data[i]);
-			}
+			print_items_by_status(&st, TODO);
+			print_items_by_status(&st, DONE);
 		}
 
 		get_menu();
@@ -92,7 +90,7 @@ int main(void)
 				}
 
 				result = EXIT_SUCCESS;
-				goto cleanup;
+				break;
 			}
 			case 2:
 			{
@@ -101,17 +99,17 @@ int main(void)
 				if (atoi(id) == 0)
 				{
 					fprintf(stderr, "INVALID INPUT\n");
-					goto cleanup;
+					break;
 				}
 
 				if (!delete_item(&st, atoi(id)))
 				{
-					goto cleanup;
+					break;
 				}
 
 				printf("ITEM DELETED\n");
 				result = EXIT_SUCCESS;
-				goto cleanup;
+				break;
 			}
 			case 0:
 			default:
