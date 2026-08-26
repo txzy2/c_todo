@@ -77,6 +77,7 @@ int main(void)
 			if (st.size > 0)
 			{
 				print_header();
+				print_items_by_status(&st, WORK);
 				print_items_by_status(&st, TODO);
 				print_items_by_status(&st, DONE);
 			}
@@ -140,6 +141,44 @@ int main(void)
 
 				printf("\nPress Enter to continue...");
 				getchar();
+				break;
+			}
+			case 4:
+			{
+				char id[10];
+				get_input("Paste ID:", id, sizeof(id));
+				if (atoi(id) == 0)
+				{
+					fprintf(stderr, "INVALID INPUT\n");
+					break;
+				}
+
+				Item *item = find_item(&st, atoi(id));
+				if (item == NULL)
+				{
+					fprintf(stderr, "ITEM NOT FOUND\n");
+				}
+
+				char status[STATUS_LENGTH];
+				if (!get_input("Status ('DONE', 'TODO', 'WORK', 'CANCELED', 'ARCHIVE'): ", status, sizeof(status)))
+				{
+					fprintf(stderr, "INVALID INPUT\n");
+					break;
+				}
+
+				enum Status s = string_to_enum(status);
+				if (s == UNKNOWN)
+				{
+					fprintf(stderr, "INVALID STATUS\n");
+					break;
+				}
+
+				if (!change_status(&st, atoi(id), s))
+				{
+					fprintf(stderr, "ERROR CONVERT STATUS\n");
+					break;
+				}
+
 				break;
 			}
 			case 0:

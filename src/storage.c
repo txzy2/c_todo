@@ -50,7 +50,7 @@ bool load_storage(Storage *st)
 		{
 			enum Status status = string_to_enum(status_str);
 
-			if (status == DONE || status == TODO)
+			if (status == DONE || status == TODO || status == WORK)
 			{
 				Item *item = create_item(id_str, title, desc, status, date, st);
 				if (item == NULL)
@@ -198,6 +198,27 @@ bool delete_item(Storage *st, const int id)
 	st->data = buff_data;
 	st->size = new_size;
 
+	return save_storage_to_file(st);
+}
+
+bool move_into_archive(char *str)
+{
+	if (str == NULL)
+	{
+		return false;
+	}
+
+	write_to_file(ARCHIVE_FILE, str, APPEND);
+	return true;
+}
+
+bool save_storage_to_file(Storage *st)
+{
+	if (st == NULL)
+	{
+		return false;
+	}
+
 	if (!write_to_file(FILENAME, "", WRITE))
 	{
 		fprintf(stderr, "ERROR WRITE TO FILE\n");
@@ -219,16 +240,5 @@ bool delete_item(Storage *st, const int id)
 		}
 	}
 
-	return true;
-}
-
-bool move_into_archive(char *str)
-{
-	if (str == NULL)
-	{
-		return false;
-	}
-
-	write_to_file(ARCHIVE_FILE, str, APPEND);
 	return true;
 }

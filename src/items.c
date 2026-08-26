@@ -54,7 +54,7 @@ bool create(Storage *st)
 
 	char title[TITLE_LENGTH];
 	char desc[DESC_LENGTH];
-	char status[10];
+	char status[STATUS_LENGTH];
 
 	if (!get_input("Title (max 49 chars): ", title, sizeof(title)))
 	{
@@ -66,7 +66,7 @@ bool create(Storage *st)
 		return false;
 	}
 
-	if (!get_input("Status ('DONE', 'TODO'): ", status, sizeof(status)))
+	if (!get_input("Status ('DONE', 'TODO', 'WORK'): ", status, sizeof(status)))
 	{
 		return false;
 	}
@@ -78,9 +78,9 @@ bool create(Storage *st)
 		fprintf(stderr, "Error: unknown status\n");
 		return false;
 	}
-	else if (s != DONE && s != TODO)
+	else if (s != DONE && s != TODO && s != WORK)
 	{
-		fprintf(stderr, "Error: status must be 'TODO' or 'DONE'\n");
+		fprintf(stderr, "Error: status must be 'TODO' or 'DONE' or 'WORK'\n");
 		return false;
 	}
 
@@ -98,15 +98,7 @@ bool create(Storage *st)
 
 	char buff[LINE_BUFFER_SIZE];
 	char date_tmp[BUFFER_TIME];
-
-	strncpy(date_tmp, item->date, sizeof(date_tmp) - 1);
-	date_tmp[sizeof(date_tmp) - 1] = '\0';
-
-	char *p = strchr(date_tmp, '|');
-	if (p != NULL)
-	{
-		*p = '\0';
-	}
+	get_date(date_tmp, sizeof(date_tmp), item);
 
 	int res = snprintf(buff, sizeof(buff), "%d;%s;%s;%s;%s", item->id, item->title, item->desc,
 	                   enum_to_string(item->status), date_tmp);
@@ -122,8 +114,28 @@ bool create(Storage *st)
 
 bool change_status(Storage *st, int id, enum Status s)
 {
-	(void)st;
-	(void)id;
-	(void)s;
-	return false;
+	if (st == NULL || id <= 0 || s == UNKNOWN)
+	{
+		return false;
+	}
+
+	Item *item = find_item(st, id);
+	if (item == NULL)
+	{
+		return false;
+	}
+	item->status = s;
+
+	return save_storage_to_file(st);
+}
+
+void get_date(char *buff, size_t size, Item *item)
+{
+	snprintf(buff, size, "%s", item->date);
+
+	char *p = strchr(buff, '|');
+	if (p != NULL)
+	{
+		*p = '\0';
+	}
 }

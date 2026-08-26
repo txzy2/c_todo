@@ -28,6 +28,8 @@ char *enum_to_string(const enum Status s)
 			return "TODO";
 		case DONE:
 			return "DONE";
+		case WORK:
+			return "WORK";
 		case CANCELED:
 			return "CANCELED";
 		case DELETED:
@@ -40,9 +42,9 @@ char *enum_to_string(const enum Status s)
 
 enum Status string_to_enum(const char *str)
 {
-	const char *statuses[] = {"TODO", "DONE", "CANCELED", "DELETED"};
+	const char *statuses[] = {"TODO", "DONE", "WORK", "CANCELED", "DELETED"};
 
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		if (strcmp(str, statuses[i]) == 0)
 		{
@@ -75,8 +77,8 @@ bool get_input(const char *msg, char *buff, size_t size)
 
 void print_header(void)
 {
-	printf("\n ID  STATUS  DATE        TITLE\n");
-	printf("---  ------  ----------  ----------------------------\n");
+	printf("\n ID   STATUS  DATE        TITLE\n");
+	printf("----  ------  ----------  ----------------------------\n");
 }
 
 void print_item(Item *item)
@@ -86,9 +88,12 @@ void print_item(Item *item)
 		return;
 	}
 	char *status = enum_to_string(item->status);
-	char *color = item->status == DONE ? GREEN : item->status == TODO ? YELLOW : RED;
+	char *color = item->status == DONE ? GREEN : item->status == TODO ? YELLOW : item->status == WORK ? CYAN : RED;
 
-	printf(" %-2d  %s%-6s" RESET "  %-10s  %-.28s\n", item->id, color, status, item->date, item->title);
+	char date_tmp[BUFFER_TIME];
+	get_date(date_tmp, sizeof(date_tmp), item);
+
+	printf(GREEN " %-2d" RESET "  %s%-6s" RESET "  %-10s  %-.50s\n", item->id, color, status, date_tmp, item->title);
 }
 
 void print_items_by_status(Storage *st, enum Status status)
@@ -107,6 +112,7 @@ void get_menu(void)
 	printf(CYAN "\n-------- MENU --------\n" RESET " 1  Add Item\n"
 	            " 2  Delete Item\n"
 	            " 3  View Item\n"
+	            " 4  Change Status\n"
 	            " 0  Exit\n" CYAN "-----------------------\n" RESET);
 }
 
