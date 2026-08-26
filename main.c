@@ -201,6 +201,7 @@ int main(void)
 		{
 			printf("Bye-bye! Press Enter to continue...");
 			getchar();
+			clear_terminal();
 		}
 	}
 
@@ -210,6 +211,7 @@ cleanup:
 	atomic_store(&running, false);
 	pthread_join(timer, NULL);
 
+	clear_terminal();
 	clear_storage(&st);
 
 	return result;
