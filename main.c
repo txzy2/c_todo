@@ -77,8 +77,19 @@ int main(void)
 			if (st.size > 0)
 			{
 				print_header();
-				print_items_by_status(&st, WORK);
-				print_items_by_status(&st, TODO);
+
+				int printed = print_items_by_status(&st, TODO);
+				if (printed > 0)
+				{
+					printf(DIM "------------------------------------------------------\n" RESET);
+				}
+
+				printed = print_items_by_status(&st, WORK);
+				if (printed > 0)
+				{
+					printf(DIM "------------------------------------------------------\n" RESET);
+				}
+
 				print_items_by_status(&st, DONE);
 			}
 		}

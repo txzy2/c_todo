@@ -44,15 +44,30 @@ bool load_storage(Storage *st)
 
 	while (fgets(buffStr, sizeof(buffStr), fptr))
 	{
-		char id_str[20], title[TITLE_LENGTH], desc[DESC_LENGTH], status_str[10], date[BUFFER_TIME];
+		char *p = buffStr;
+		char *fields[5] = {0};
 
-		if (sscanf(buffStr, "%19[^;];%49[^;];%255[^;];%9[^;];%29[^;\n]", id_str, title, desc, status_str, date) == 5)
+		for (int field = 0; field < 5 && p != NULL; field++)
 		{
-			enum Status status = string_to_enum(status_str);
+			char *end = strchr(p, ';');
+			if (end != NULL)
+			{
+				*end = '\0';
+			}
+
+			fields[field] = p;
+			p = (end != NULL) ? end + 1 : NULL;
+		}
+
+		if (fields[0] && fields[1] && fields[2] && fields[3] && fields[4])
+		{
+			fields[4][strcspn(fields[4], "\n")] = '\0';
+
+			enum Status status = string_to_enum(fields[3]);
 
 			if (status == DONE || status == TODO || status == WORK)
 			{
-				Item *item = create_item(id_str, title, desc, status, date, st);
+				Item *item = create_item(fields[0], fields[1], fields[2], status, fields[4], st);
 				if (item == NULL)
 				{
 					fprintf(stderr, "Memory allocation failed\n");

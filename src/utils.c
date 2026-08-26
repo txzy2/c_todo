@@ -75,6 +75,42 @@ bool get_input(const char *msg, char *buff, size_t size)
 	return true;
 }
 
+const char *status_color(enum Status s)
+{
+	switch (s)
+	{
+		case DONE:
+			return GREEN;
+		case TODO:
+			return YELLOW;
+		case WORK:
+			return CYAN;
+		case CANCELED:
+		case DELETED:
+			return RED;
+		default:
+			return RESET;
+	}
+}
+
+char status_symbol(enum Status s)
+{
+	switch (s)
+	{
+		case DONE:
+			return 'v';
+		case WORK:
+			return '~';
+		case TODO:
+			return '*';
+		case CANCELED:
+		case DELETED:
+			return 'x';
+		default:
+			return '?';
+	}
+}
+
 void print_header(void)
 {
 	printf("\n ID   STATUS  DATE        TITLE\n");
@@ -88,32 +124,39 @@ void print_item(Item *item)
 		return;
 	}
 	char *status = enum_to_string(item->status);
-	char *color = item->status == DONE ? GREEN : item->status == TODO ? YELLOW : item->status == WORK ? CYAN : RED;
+	const char *color = status_color(item->status);
+	char sym = status_symbol(item->status);
 
 	char date_tmp[BUFFER_TIME];
 	get_date(date_tmp, sizeof(date_tmp), item);
 
-	printf(GREEN " %-2d" RESET "  %s%-6s" RESET "  %-10s  %-.50s\n", item->id, color, status, date_tmp, item->title);
+	printf(GREEN " %-2d" RESET "  %s%c %-4s" RESET "  " DIM "%-10s" RESET "  " BOLD "%-.50s" RESET "\n", item->id,
+	       color, sym, status, date_tmp, item->title);
 }
 
-void print_items_by_status(Storage *st, enum Status status)
+int print_items_by_status(Storage *st, enum Status status)
 {
+	int n = 0;
+
 	for (int i = 0; i < st->size; ++i)
 	{
 		if (st->data[i]->status == status)
 		{
 			print_item(st->data[i]);
+			n++;
 		}
 	}
+
+	return n;
 }
 
 void get_menu(void)
 {
-	printf(CYAN "\n-------- MENU --------\n" RESET " 1  Add Item\n"
+	printf(CYAN "\n--------------- MENU ----------------\n" RESET " 1  Add Item\n"
 	            " 2  Delete Item\n"
 	            " 3  View Item\n"
 	            " 4  Change Status\n"
-	            " 0  Exit\n" CYAN "-----------------------\n" RESET);
+	            " 0  Exit\n" CYAN "-------------------------------------\n" RESET);
 }
 
 void print_item_details(Item *item)
@@ -124,13 +167,12 @@ void print_item_details(Item *item)
 	}
 
 	char *status = enum_to_string(item->status);
-	char *color = item->status == DONE ? GREEN : item->status == TODO ? YELLOW : RED;
+	const char *color = status_color(item->status);
+	char sym = status_symbol(item->status);
 
-	printf("\n-------------- ITEM #%d --------------\n"
-	       "Title:       %s\n"
-	       "Description: %s\n"
-	       "Status:      %s%s" RESET "\n"
-	       "Date:        %s\n"
-	       "-------------------------------------\n",
-	       item->id, item->title, item->desc, color, status, item->date);
+	printf("\n" MAGENTA "-------------- ITEM #%d --------------" RESET "\n" MAGENTA "Title:      " RESET " " BOLD
+	       "%s" RESET "\n" MAGENTA "Description:" RESET " %s\n" MAGENTA "Status:     " RESET " %s%c %s" RESET
+	       "\n" MAGENTA "Date:       " RESET " " DIM "%s" RESET "\n" MAGENTA
+	       "-------------------------------------" RESET "\n",
+	       item->id, item->title, item->desc, color, sym, status, item->date);
 }
