@@ -10,6 +10,7 @@
 char FILENAME[MAX_PATH_LEN];
 char ARCHIVE_FILE[MAX_PATH_LEN];
 char LOG_FILE[MAX_PATH_LEN];
+char TEMP_FILE[MAX_PATH_LEN];
 
 bool write_to_file(const char *filename, const char *text, const char *mode)
 {
@@ -72,12 +73,11 @@ bool remove_line_from_file(const char *filename, const char *target)
 
 	char line[512];
 	char target_copy[512];
-	char temp_filename[] = "./storage/temp.csv";
 
 	snprintf(target_copy, sizeof(target_copy), "%s", target);
 	target_copy[strcspn(target_copy, "\r\n")] = '\0';
 
-	if (!write_to_file(temp_filename, "", WRITE))
+	if (!write_to_file(TEMP_FILE, "", WRITE))
 	{
 		fclose(src);
 		return false;
@@ -95,7 +95,7 @@ bool remove_line_from_file(const char *filename, const char *target)
 			continue;
 		}
 
-		if (!write_to_file(temp_filename, line, APPEND))
+		if (!write_to_file(TEMP_FILE, line, APPEND))
 		{
 			fclose(src);
 			return false;
@@ -106,17 +106,17 @@ bool remove_line_from_file(const char *filename, const char *target)
 
 	if (!found)
 	{
-		remove(temp_filename);
+		remove(TEMP_FILE);
 		return false;
 	}
 
 	if (remove(filename) != 0)
 	{
-		remove(temp_filename);
+		remove(TEMP_FILE);
 		return false;
 	}
 
-	if (rename(temp_filename, filename) != 0)
+	if (rename(TEMP_FILE, filename) != 0)
 	{
 		return false;
 	}
@@ -170,6 +170,13 @@ void init_storage_paths(void)
 	if (res < 0 || (size_t)res >= sizeof(LOG_FILE))
 	{
 		fprintf(stderr, "Error: log path too long\n");
+		exit(EXIT_FAILURE);
+	}
+
+	res = snprintf(TEMP_FILE, sizeof(TEMP_FILE), "%s/temp.csv", base_dir);
+	if (res < 0 || (size_t)res >= sizeof(TEMP_FILE))
+	{
+		fprintf(stderr, "Error: temp path too long\n");
 		exit(EXIT_FAILURE);
 	}
 }
