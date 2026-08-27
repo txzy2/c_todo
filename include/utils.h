@@ -16,7 +16,7 @@
 bool clear_terminal(void);
 
 void get_time(char *buff, size_t size);
-void get_date(char *buff, size_t size, Item *item);
+void get_date(char *buff, size_t size);
 enum Status string_to_enum(const char *str);
 char *enum_to_string(const enum Status s);
 

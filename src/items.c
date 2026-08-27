@@ -34,7 +34,7 @@ Item *create_item(const char *id, const char *title, const char *desc, const enu
 
 	if (date == NULL)
 	{
-		get_time(item->date, sizeof(item->date));
+		get_date(item->date, sizeof(item->date));
 	}
 	else
 	{
@@ -98,7 +98,7 @@ bool create(Storage *st)
 
 	char buff[LINE_BUFFER_SIZE];
 	char date_tmp[BUFFER_TIME];
-	get_date(date_tmp, sizeof(date_tmp), item);
+	get_date(date_tmp, sizeof(date_tmp));
 
 	int res = snprintf(buff, sizeof(buff), "%d;%s;%s;%s;%s", item->id, item->title, item->desc,
 	                   enum_to_string(item->status), date_tmp);
@@ -127,15 +127,4 @@ bool change_status(Storage *st, int id, enum Status s)
 	item->status = s;
 
 	return save_storage_to_file(st);
-}
-
-void get_date(char *buff, size_t size, Item *item)
-{
-	snprintf(buff, size, "%s", item->date);
-
-	char *p = strchr(buff, '|');
-	if (p != NULL)
-	{
-		*p = '\0';
-	}
 }

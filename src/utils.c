@@ -20,6 +20,14 @@ void get_time(char *buff, size_t size)
 	         cur->tm_hour, cur->tm_min, cur->tm_sec);
 }
 
+void get_date(char *buff, size_t size)
+{
+	time_t now = time(NULL);
+	struct tm *cur = localtime(&now);
+
+	snprintf(buff, size, "%02d.%02d.%04d", cur->tm_mday, cur->tm_mon + 1, cur->tm_year + 1900);
+}
+
 char *enum_to_string(const enum Status s)
 {
 	switch (s)
@@ -128,7 +136,7 @@ void print_item(Item *item)
 	char sym = status_symbol(item->status);
 
 	char date_tmp[BUFFER_TIME];
-	get_date(date_tmp, sizeof(date_tmp), item);
+	get_date(date_tmp, sizeof(date_tmp));
 
 	printf(GREEN " %-2d" RESET "  %s%c %-4s" RESET "  " DIM "%-10s" RESET "  " BOLD "%-.50s" RESET "\n", item->id,
 	       color, sym, status, date_tmp, item->title);
