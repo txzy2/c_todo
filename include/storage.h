@@ -6,7 +6,7 @@
 bool init_storage(Storage *st, uint32_t cap);
 bool load_storage(Storage *st);
 bool move_into_storage(Storage *st, Item *item);
-bool move_into_archive(char *str);
+bool move_into_archive(const char *str);
 void clear_storage(Storage *st);
 bool save_storage_to_file(Storage *st);
 

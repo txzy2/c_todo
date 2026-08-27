@@ -77,7 +77,7 @@ bool remove_line_from_file(const char *filename, const char *target)
 	snprintf(target_copy, sizeof(target_copy), "%s", target);
 	target_copy[strcspn(target_copy, "\r\n")] = '\0';
 
-	if (!write_to_file(temp_filename, "", "w"))
+	if (!write_to_file(temp_filename, "", WRITE))
 	{
 		fclose(src);
 		return false;
@@ -104,7 +104,13 @@ bool remove_line_from_file(const char *filename, const char *target)
 
 	fclose(src);
 
-	if (!found || remove(filename) != 0)
+	if (!found)
+	{
+		remove(temp_filename);
+		return false;
+	}
+
+	if (remove(filename) != 0)
 	{
 		remove(temp_filename);
 		return false;

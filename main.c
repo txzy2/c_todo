@@ -171,7 +171,7 @@ int main(void)
 				}
 
 				char status[STATUS_LENGTH];
-				if (!get_input("Status ('DONE', 'TODO', 'WORK', 'CANCELED', 'ARCHIVE'): ", status, sizeof(status)))
+				if (!get_input("Status ('DONE', 'TODO', 'WORK', 'CANCELED', 'DELETED'): ", status, sizeof(status)))
 				{
 					fprintf(stderr, "INVALID INPUT\n");
 					break;

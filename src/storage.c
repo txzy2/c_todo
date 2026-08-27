@@ -44,6 +44,9 @@ bool load_storage(Storage *st)
 
 	while (fgets(buffStr, sizeof(buffStr), fptr))
 	{
+		char originalLine[LINE_BUFFER_SIZE];
+		snprintf(originalLine, sizeof(originalLine), "%s", buffStr);
+
 		char *p = buffStr;
 		char *fields[5] = {0};
 
@@ -81,15 +84,20 @@ bool load_storage(Storage *st)
 			}
 			else
 			{
-				if (!remove_line_from_file(FILENAME, buffStr))
+				char log[DESC_LENGTH];
+				get_time(log, sizeof(log));
+
+				if (!remove_line_from_file(FILENAME, originalLine))
 				{
-					write_to_file(LOG_FILE, "ERROR REMOVE FROM MAIN FILE", APPEND);
+					strcat(log, " ERROR REMOVE FROM MAIN FILE");
+					write_to_file(LOG_FILE, log, APPEND);
 					continue;
 				}
 
-				if (!move_into_archive(buffStr))
+				if (!move_into_archive(originalLine))
 				{
-					write_to_file(LOG_FILE, "ERROR MOVE TO ARCHIVE", APPEND);
+					strcat(log, " ERROR MOVE TO ARCHIVE");
+					write_to_file(LOG_FILE, log, APPEND);
 					continue;
 				}
 			}
@@ -216,15 +224,14 @@ bool delete_item(Storage *st, const int id)
 	return save_storage_to_file(st);
 }
 
-bool move_into_archive(char *str)
+bool move_into_archive(const char *str)
 {
 	if (str == NULL)
 	{
 		return false;
 	}
 
-	write_to_file(ARCHIVE_FILE, str, APPEND);
-	return true;
+	return write_to_file(ARCHIVE_FILE, str, APPEND);
 }
 
 bool save_storage_to_file(Storage *st)
