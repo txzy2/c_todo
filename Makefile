@@ -9,7 +9,7 @@ init:
 	mkdir -p bin
 
 b:
-	gcc -std=c11 -O2 -Wall -Wextra -Wpedantic -Iinclude -pthread main.c src/files.c src/storage.c src/utils.c src/items.c -o bin/$(BINARY_NAME)
+	gcc -std=c11 -O2 -Wall -Wextra -Wpedantic -Iinclude -Ilib/logger -pthread main.c src/files.c src/storage.c src/utils.c src/items.c lib/logger/logger.c -o bin/$(BINARY_NAME)
 
 r: b
 	TXTODO_HOME=$(DEV_STORAGE) ./bin/$(BINARY_NAME)

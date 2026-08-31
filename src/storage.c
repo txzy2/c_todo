@@ -2,6 +2,7 @@
 #include "../include/files.h"
 #include "../include/items.h"
 #include "../include/utils.h"
+#include "../lib/logger/logger.h"
 #include <linux/limits.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -84,20 +85,15 @@ bool load_storage(Storage *st)
 			}
 			else
 			{
-				char log[DESC_LENGTH];
-				get_time(log, sizeof(log));
-
 				if (!remove_line_from_file(FILENAME, originalLine))
 				{
-					strcat(log, " ERROR REMOVE FROM MAIN FILE");
-					write_to_file(LOG_FILE, log, APPEND);
+					warn(&logger, "Error: failed to remove line from file");
 					continue;
 				}
 
 				if (!move_into_archive(originalLine))
 				{
-					strcat(log, " ERROR MOVE TO ARCHIVE");
-					write_to_file(LOG_FILE, log, APPEND);
+					warn(&logger, "Error: failed to move into archive");
 					continue;
 				}
 			}

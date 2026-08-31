@@ -9,7 +9,10 @@
 #include "include/storage.h"
 #include "include/utils.h"
 
+#include "lib/logger/logger.h"
+
 atomic_bool running = true;
+Logger logger;
 
 void *timer_thread(void *arg)
 {
@@ -38,21 +41,24 @@ bool preprocess(Storage *st)
 {
 	if (!init_storage(st, 1))
 	{
-		fprintf(stderr, "Error: failed to initialize storage\n");
+		warn(&logger, "Error: failed to init storage");
 		return false;
 	}
 
 	if (!load_storage(st))
 	{
-		fprintf(stderr, "Error: failed to load storage\n");
+		warn(&logger, "Error: failed to load storage");
 		return false;
 	}
 
 	return true;
 }
 
-int main(void)
+int main()
 {
+	logger = get_logger(DEV);
+	debug(&logger, "%s", "LOGGER WORKS");
+
 	init_storage_paths();
 
 	int result = EXIT_FAILURE;
